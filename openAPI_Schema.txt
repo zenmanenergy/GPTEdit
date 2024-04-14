@@ -1,0 +1,148 @@
+openapi: 3.0.3
+info:
+  title: File Management API
+  version: 1.0.0
+  description: API for managing files and folders within a Flask application.
+servers:
+  - url: https://zmjy8jg52f.execute-api.us-east-1.amazonaws.com/default/GPTEdit
+    description: Development server
+
+paths:
+  /editFile:
+    post:
+      summary: Edit or create a file with provided text content.
+      operationId: editFile
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                  description: Text content to write to the file.
+                file_path:
+                  type: string
+                  description: Path of the file to edit or create.
+              required:
+                - text
+                - file_path
+      responses:
+        '200':
+          description: Successfully edited or created file.
+        '400':
+          description: Request parameters missing or invalid.
+
+  /deleteFile/{file_path}:
+    get:
+      summary: Delete a specific file.
+      operationId: deleteFile
+      parameters:
+        - in: path
+          name: file_path
+          required: true
+          schema:
+            type: string
+          description: Path to the file to be deleted.
+      responses:
+        '200':
+          description: File deleted successfully.
+        '404':
+          description: File not found.
+
+  /deleteFolder/{folder_path}:
+    get:
+      summary: Delete a specific folder and its contents.
+      operationId: deleteFolder
+      parameters:
+        - in: path
+          name: folder_path
+          required: true
+          schema:
+            type: string
+          description: Path to the folder to be deleted.
+      responses:
+        '200':
+          description: Folder deleted successfully.
+        '404':
+          description: Folder not found.
+        '500':
+          description: An error occurred during the deletion process.
+
+  /listFiles:
+    get:
+      summary: List all files and folders.
+      operationId: listFiles
+      responses:
+        '200':
+          description: List of all files and folders.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  folders:
+                    type: array
+                    items:
+                      type: string
+                  files:
+                    type: array
+                    items:
+                      type: string
+
+  /getFilesInFolder/{folder_path}:
+    get:
+      summary: Get contents of all files in the specified directory.
+      operationId: getFilesInFolder
+      parameters:
+        - in: path
+          name: folder_path
+          required: true
+          schema:
+            type: string
+          description: Relative path to the folder whose files are to be retrieved.
+      responses:
+        '200':
+          description: Contents of all files in the specified folder.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: A JSON object where each key is a relative file path and the value is the content of that file.
+                additionalProperties:
+                  type: object
+                  properties:
+                    content:
+                      type: string
+                      description: The content of the file as a string.
+        '404':
+          description: Folder not found.
+
+  /getSingleFile/{file_path}:
+    get:
+      summary: Retrieve the content of a single file.
+      operationId: getSingleFile
+      parameters:
+        - in: path
+          name: file_path
+          required: true
+          schema:
+            type: string
+          description: Path to the file for which content is requested.
+      responses:
+        '200':
+          description: Content of the specified file.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  file_path:
+                    type: string
+                    description: The path of the file.
+                  content:
+                    type: string
+                    description: The content of the file.
+        '404':
+          description: File not found.
